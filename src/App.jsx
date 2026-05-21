@@ -15,43 +15,43 @@ const galleryItems = [
     id: 'frontis',
     name: 'Frontis',
     type: '360',
-    panorama: '/frontis.jpg',
-    thumbnail: '/frontis.jpg',
+    panorama: './frontis.jpg',
+    thumbnail: './frontis.jpg',
   },
   {
     id: 'centro',
     name: 'Centro',
     type: '360',
-    panorama: '/centro.jpg',
-    thumbnail: '/centro.jpg',
+    panorama: './centro.jpg',
+    thumbnail: './centro.jpg',
   },
   {
     id: 'panoramico',
     name: 'Panorámico',
     type: '360',
-    panorama: '/panoramico.jpg',
-    thumbnail: '/panoramico.jpg',
+    panorama: './panoramico.jpg',
+    thumbnail: './panoramico.jpg',
   },
   {
     id: 'vista1',
     name: 'Vista 1',
     type: '2D',
-    panorama: '/vista1.jpg',
-    thumbnail: '/vista1.jpg',
+    panorama: './vista1.jpg',
+    thumbnail: './vista1.jpg',
   },
   {
     id: 'vista2',
     name: 'Vista 2',
     type: '2D',
-    panorama: '/vista2.jpg',
-    thumbnail: '/vista2.jpg',
+    panorama: './vista2.jpg',
+    thumbnail: './vista2.jpg',
   },
   {
     id: 'vista3',
     name: 'Vista 3',
     type: '2D',
-    panorama: '/vista3.jpg',
-    thumbnail: '/vista3.jpg',
+    panorama: './vista3.jpg',
+    thumbnail: './vista3.jpg',
   },
 ];
 
@@ -67,7 +67,7 @@ function App() {
 
     const viewer = new Viewer({
       container: containerRef.current,
-      panorama: '/frontis.jpg',
+      panorama: './frontis.jpg',
       caption: 'Vista Frontis 360',
       plugins: [
         [CompassPlugin, {
@@ -77,7 +77,7 @@ function App() {
           ],
         }],
         [MapPlugin, {
-          imageUrl: '/minimapa.png',
+          imageUrl: './minimapa.png',
           center: { x: 512, y: 800 },
           rotation: '0deg',
           shape: 'square',
