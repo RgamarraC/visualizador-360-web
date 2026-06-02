@@ -339,15 +339,126 @@ html,
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
+  /* Navigation buttons */
   .floating-nav-btn {
-    width: 40px;
-    height: 40px;
+    width: 38px;
+    height: 38px;
+    opacity: 0.85;
   }
   .nav-btn-left {
-    left: 15px;
+    left: 10px;
   }
   .nav-btn-right {
+    right: 10px;
+  }
+
+  /* Header */
+  .app-header {
+    top: 15px;
+    left: 15px;
+    padding: 10px 15px;
+    border-radius: 12px;
+  }
+  .main-title {
+    font-size: 15px;
+    letter-spacing: 1px;
+    margin-bottom: 2px;
+  }
+  .sub-title {
+    font-size: 8px;
+    letter-spacing: 2px;
+  }
+
+  /* Map/Compass Customization on Mobile */
+  .psv-map-container {
+    width: 105px !important;
+    height: 105px !important;
+    bottom: 125px !important; /* Elevated to sit nicely above the gallery dock scroll */
+    left: 15px !important;
+  }
+  .psv-map-image {
+    width: 100% !important;
+    height: 100% !important;
+  }
+  .psv-compass {
+    top: 15px !important;
+    right: 15px !important;
+    width: 65px !important;
+    height: 65px !important;
+  }
+
+  /* Custom Gallery Dock Scroll */
+  .custom-gallery-dock {
+    width: calc(100% - 30px);
+    max-width: 480px;
+    gap: 10px;
+    padding: 10px;
+    bottom: 50px;
+    overflow-x: auto;
+    justify-content: flex-start;
+    -webkit-overflow-scrolling: touch;
+    border-radius: 16px;
+  }
+  .custom-gallery-dock::-webkit-scrollbar {
+    display: none; /* Hide scrollbar for a native feel */
+  }
+  .custom-gallery-item {
+    width: 100px;
+    height: 60px;
+    flex-shrink: 0;
+  }
+  .custom-gallery-badge {
+    font-size: 8px;
+    padding: 1px 4px;
+    top: 4px;
+    right: 4px;
+    border-radius: 4px;
+  }
+  .custom-gallery-label {
+    font-size: 9px;
+    padding: 4px 2px;
+  }
+
+  /* Photo Modal */
+  .photo-modal-close {
+    top: 15px;
     right: 15px;
+    width: 38px;
+    height: 38px;
+  }
+  .photo-modal-close svg {
+    width: 18px;
+    height: 18px;
+  }
+  .photo-modal-caption {
+    font-size: 14px;
+    margin-top: 12px;
+  }
+
+  /* Dev Drawing Panel */
+  .dev-drawing-panel {
+    width: calc(100% - 20px);
+    top: 10px;
+    padding: 10px;
+    gap: 8px;
+  }
+  .dev-panel-title {
+    font-size: 11px;
+  }
+  .dev-panel-desc {
+    font-size: 9px;
+  }
+  .dev-panel-stats {
+    font-size: 10px;
+  }
+  .dev-btn {
+    padding: 6px 8px;
+    font-size: 9px;
+    border-radius: 6px;
+  }
+  .dev-coords-preview {
+    max-height: 80px;
+    font-size: 9px;
   }
 }
 
