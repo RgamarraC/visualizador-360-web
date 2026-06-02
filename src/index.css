@@ -103,6 +103,7 @@ html,
 }
 
 /* Map Plugin Customization */
+.psv-map,
 .psv-map-container {
   background: var(--glass-bg) !important;
   backdrop-filter: var(--glass-blur) !important;
@@ -371,6 +372,7 @@ html,
   }
 
   /* Map/Compass Customization on Mobile */
+  .psv-map,
   .psv-map-container {
     width: 105px !important;
     height: 105px !important;
@@ -463,6 +465,7 @@ html,
   }
 
   /* Hide map when gallery is open on mobile */
+  .app-container.gallery-open .psv-map,
   .app-container.gallery-open .psv-map-container {
     opacity: 0 !important;
     pointer-events: none !important;
