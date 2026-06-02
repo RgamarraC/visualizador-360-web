@@ -1,7 +1,8 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Viewer } from '@photo-sphere-viewer/core';
 import { CompassPlugin } from '@photo-sphere-viewer/compass-plugin';
 import { MapPlugin } from '@photo-sphere-viewer/map-plugin';
+import { MarkersPlugin } from '@photo-sphere-viewer/markers-plugin';
 import Header from './components/Header';
 import { X, ChevronLeft, ChevronRight } from 'lucide-react';
 
@@ -9,6 +10,7 @@ import { X, ChevronLeft, ChevronRight } from 'lucide-react';
 import '@photo-sphere-viewer/core/index.css';
 import '@photo-sphere-viewer/compass-plugin/index.css';
 import '@photo-sphere-viewer/map-plugin/index.css';
+import '@photo-sphere-viewer/markers-plugin/index.css';
 
 const galleryItems = [
   {
@@ -55,12 +57,127 @@ const galleryItems = [
   },
 ];
 
+// Líneas y áreas estáticas predefinidas por el arquitecto
+const staticLinesData = {
+  frontis: [
+    {
+      id: 'frontis-path-1',
+      polyline: [
+        [4.6897, -0.2854],
+        [4.908, -0.9532]
+      ],
+      svgStyle: {
+        stroke: '#00d2ff',
+        strokeWidth: '5px',
+        strokeLinecap: 'round',
+        strokeLinejoin: 'round',
+      },
+      tooltip: 'Delimitación Frontis'
+    }
+  ],
+  centro: [
+    {
+      id: 'centro-path-1',
+      polyline: [
+        [2.8876, -0.8354],
+        [6.2729, -0.4447]
+      ],
+      svgStyle: {
+        stroke: '#00d2ff',
+        strokeWidth: '5px',
+        strokeLinecap: 'round',
+        strokeLinejoin: 'round',
+      },
+      tooltip: 'Delimitación Centro'
+    }
+  ],
+  panoramico: [
+    {
+      id: 'panoramico-path-1',
+      polyline: [
+        [5.4855, -0.4489],
+        [6.2028, -0.6174]
+      ],
+      svgStyle: {
+        stroke: '#00d2ff',
+        strokeWidth: '5px',
+        strokeLinecap: 'round',
+        strokeLinejoin: 'round',
+      },
+      tooltip: 'Delimitación Panorámico'
+    }
+  ]
+};
+
 function App() {
   const containerRef = useRef(null);
   const viewerRef = useRef(null);
   const [isGalleryOpen, setIsGalleryOpen] = useState(false);
   const [activePanoId, setActivePanoId] = useState('frontis');
   const [selected2DImage, setSelected2DImage] = useState(null);
+
+  // Estados y Refs para Modo de Dibujo Oculto del Arquitecto (?edit=true)
+  const [editModeEnabled] = useState(() => {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('edit') === 'true';
+  });
+  const currentPointsRef = useRef([]);
+  const [drawnPoints, setDrawnPoints] = useState([]);
+  const [copied, setCopied] = useState(false);
+
+  const updateTempMarker = (points) => {
+    if (!viewerRef.current) return;
+    const markersPlugin = viewerRef.current.getPlugin(MarkersPlugin);
+    if (!markersPlugin) return;
+
+    // Eliminar marcadores temporales antiguos
+    const tempMarkers = markersPlugin.getMarkers().filter(m => m.id.startsWith('temp-'));
+    tempMarkers.forEach(m => markersPlugin.removeMarker(m.id));
+
+    // Dibujar línea temporal si hay al menos 2 puntos
+    if (points.length >= 2) {
+      markersPlugin.addMarker({
+        id: 'temp-line',
+        polyline: points,
+        svgStyle: {
+          stroke: '#ff3b30',
+          strokeWidth: '4px',
+          strokeDasharray: '6,4',
+        }
+      });
+    }
+
+    // Dibujar puntos temporales (vértices)
+    points.forEach((pt, idx) => {
+      markersPlugin.addMarker({
+        id: `temp-vertex-${idx}`,
+        position: { yaw: pt[0], pitch: pt[1] },
+        html: `<div style="width: 12px; height: 12px; background: #ff3b30; border: 2.5px solid white; border-radius: 50%; transform: translate(-6px, -6px); box-shadow: 0 2px 6px rgba(0,0,0,0.4); cursor: pointer;" title="Punto ${idx + 1}"></div>`,
+      });
+    });
+  };
+
+  const handleUndoPoint = () => {
+    const newPoints = currentPointsRef.current.slice(0, -1);
+    currentPointsRef.current = newPoints;
+    setDrawnPoints(newPoints);
+    updateTempMarker(newPoints);
+  };
+
+  const handleClearDrawing = () => {
+    currentPointsRef.current = [];
+    setDrawnPoints([]);
+    updateTempMarker([]);
+  };
+
+  const handleCopyCoordinates = () => {
+    if (drawnPoints.length === 0) return;
+    const formatted = JSON.stringify(drawnPoints, null, 4);
+    navigator.clipboard.writeText(formatted).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  };
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -128,6 +245,9 @@ function App() {
             },
           ],
         }],
+        [MarkersPlugin, {
+          markers: staticLinesData['frontis'] || [],
+        }]
       ],
       navbar: [
         'zoom',
@@ -153,14 +273,44 @@ function App() {
         if (item) {
           if (item.type === '360') {
             setSelected2DImage(null);
+            
+            // Limpiar marcadores/líneas antiguas inmediatamente
+            const markersPlugin = viewer.getPlugin(MarkersPlugin);
+            if (markersPlugin) {
+              markersPlugin.clearMarkers();
+            }
+
             viewer.setPanorama(item.panorama, {
               caption: `Vista ${item.name} 360`,
+            }).then(() => {
+              setActivePanoId(item.id);
+              
+              // Limpiar dibujo temporal al cambiar de escena
+              currentPointsRef.current = [];
+              setDrawnPoints([]);
+
+              // Cargar líneas estáticas correspondientes
+              const currentMarkersPlugin = viewer.getPlugin(MarkersPlugin);
+              if (currentMarkersPlugin) {
+                const staticLines = staticLinesData[item.id] || [];
+                staticLines.forEach((line) => currentMarkersPlugin.addMarker(line));
+              }
             });
-            setActivePanoId(item.id);
           } else {
             setSelected2DImage(item);
           }
         }
+      });
+    }
+
+    // Configurar listener de clics para el modo de dibujo del arquitecto
+    if (editModeEnabled) {
+      viewer.addEventListener('click', ({ data }) => {
+        const newPoint = [Number(data.yaw.toFixed(4)), Number(data.pitch.toFixed(4))];
+        const newPoints = [...currentPointsRef.current, newPoint];
+        currentPointsRef.current = newPoints;
+        setDrawnPoints(newPoints);
+        updateTempMarker(newPoints);
       });
     }
 
@@ -169,7 +319,7 @@ function App() {
         viewerRef.current.destroy();
       }
     };
-  }, []);
+  }, [editModeEnabled]);
 
   // Update map center when active panorama changes from gallery/keyboard navigation
   useEffect(() => {
@@ -188,21 +338,38 @@ function App() {
     }
   }, [activePanoId]);
 
-  const handleItemClick = (item) => {
+  const handleItemClick = useCallback((item) => {
     if (item.type === '360') {
       setSelected2DImage(null);
       if (viewerRef.current) {
+        // Limpiar marcadores/líneas antiguas inmediatamente
+        const markersPlugin = viewerRef.current.getPlugin(MarkersPlugin);
+        if (markersPlugin) {
+          markersPlugin.clearMarkers();
+        }
+
         viewerRef.current.setPanorama(item.panorama, {
           caption: `Vista ${item.name} 360`,
+        }).then(() => {
+          setActivePanoId(item.id);
+          
+          // Limpiar dibujo temporal
+          currentPointsRef.current = [];
+          setDrawnPoints([]);
+
+          const currentMarkersPlugin = viewerRef.current.getPlugin(MarkersPlugin);
+          if (currentMarkersPlugin) {
+            const staticLines = staticLinesData[item.id] || [];
+            staticLines.forEach((line) => currentMarkersPlugin.addMarker(line));
+          }
         });
-        setActivePanoId(item.id);
       }
     } else {
       setSelected2DImage(item);
     }
-  };
+  }, []);
 
-  const navigateView = (direction) => {
+  const navigateView = useCallback((direction) => {
     let currentIndex = 0;
     if (selected2DImage) {
       currentIndex = galleryItems.findIndex((item) => item.id === selected2DImage.id);
@@ -219,7 +386,7 @@ function App() {
 
     const nextItem = galleryItems[newIndex];
     handleItemClick(nextItem);
-  };
+  }, [activePanoId, selected2DImage, handleItemClick]);
 
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -236,12 +403,56 @@ function App() {
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [activePanoId, selected2DImage]);
+  }, [activePanoId, selected2DImage, navigateView]);
 
   return (
     <div className="app-container" style={{ width: '100vw', height: '100vh', position: 'relative' }}>
       <Header />
       <div style={{ width: '100%', height: '100%' }} ref={containerRef}></div>
+
+      {/* Panel de Dibujo del Arquitecto (Oculto, se activa con ?edit=true) */}
+      {editModeEnabled && (
+        <div className="dev-drawing-panel">
+          <div className="dev-panel-header">
+            <span className="dev-panel-title">Creador de Líneas</span>
+            <span className="dev-panel-badge">MODO DIBUJO</span>
+          </div>
+          <p className="dev-panel-desc">
+            Haz clic en el panorama 360 para trazar una línea. Al finalizar, copia las coordenadas e insértalas en <code>staticLinesData</code>.
+          </p>
+          <div className="dev-panel-stats">
+            <span>Puntos marcados: <strong>{drawnPoints.length}</strong></span>
+          </div>
+          <div className="dev-panel-actions">
+            <button
+              disabled={drawnPoints.length === 0}
+              onClick={handleUndoPoint}
+              className="dev-btn dev-btn-secondary"
+            >
+              Deshacer
+            </button>
+            <button
+              disabled={drawnPoints.length === 0}
+              onClick={handleClearDrawing}
+              className="dev-btn dev-btn-danger"
+            >
+              Limpiar
+            </button>
+            <button
+              disabled={drawnPoints.length === 0}
+              onClick={handleCopyCoordinates}
+              className="dev-btn dev-btn-primary"
+            >
+              {copied ? '¡Copiado!' : 'Copiar Coordenadas'}
+            </button>
+          </div>
+          {drawnPoints.length > 0 && (
+            <pre className="dev-coords-preview">
+              {JSON.stringify(drawnPoints)}
+            </pre>
+          )}
+        </div>
+      )}
 
       {/* Botones de navegación flotantes */}
       <button className="floating-nav-btn nav-btn-left" onClick={() => navigateView('prev')} title="Anterior (Flecha Izquierda / A)">
