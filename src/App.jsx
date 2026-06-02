@@ -406,7 +406,7 @@ function App() {
   }, [activePanoId, selected2DImage, navigateView]);
 
   return (
-    <div className="app-container" style={{ width: '100vw', height: '100vh', position: 'relative' }}>
+    <div className={`app-container ${isGalleryOpen ? 'gallery-open' : ''}`} style={{ width: '100vw', height: '100vh', position: 'relative' }}>
       <Header />
       <div style={{ width: '100%', height: '100%' }} ref={containerRef}></div>
 

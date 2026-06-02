@@ -113,6 +113,7 @@ html,
   bottom: 80px !important;
   /* Raised to avoid collision with navbar */
   left: 20px !important;
+  transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1), transform 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 
 .psv-compass {
@@ -459,6 +460,13 @@ html,
   .dev-coords-preview {
     max-height: 80px;
     font-size: 9px;
+  }
+
+  /* Hide map when gallery is open on mobile */
+  .app-container.gallery-open .psv-map-container {
+    opacity: 0 !important;
+    pointer-events: none !important;
+    transform: translateY(20px) !important;
   }
 }
 
