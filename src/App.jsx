@@ -63,8 +63,12 @@ const staticLinesData = {
     {
       id: 'frontis-path-1',
       polyline: [
-        [4.6897, -0.2854],
-        [4.908, -0.9532]
+        [4.3339, -0.2783],
+        [4.9832, -0.2527],
+        [5.6545, -0.7913],
+        [4.9322, -1.0194],
+        [3.9474, -0.9666],
+        [4.3339, -0.2783]
       ],
       svgStyle: {
         stroke: '#00d2ff',
@@ -73,14 +77,56 @@ const staticLinesData = {
         strokeLinejoin: 'round',
       },
       tooltip: 'Delimitación Frontis'
+    },
+    {
+      id: 'frontis-path-2',
+      polyline: [
+        [4.6337, -0.2833],
+        [4.9212, -1.0165]
+      ],
+      svgStyle: {
+        stroke: '#00d2ff',
+        strokeWidth: '5px',
+        strokeLinecap: 'round',
+        strokeLinejoin: 'round',
+      },
+      tooltip: 'Delimitación Frontis 2'
+    },
+    {
+      id: 'lote-a',
+      position: { yaw: 4.4666, pitch: -0.5617 },
+      html: `
+        <div class="custom-marker-card">
+          <div class="marker-title">Lote A</div>
+          <div class="marker-detail">Área: 598m²</div>
+          <div class="marker-status status-sold">Vendido</div>
+        </div>
+      `,
+      anchor: 'bottom center'
+    },
+    {
+      id: 'lote-b',
+      position: { yaw: 4.9618, pitch: -0.5168 },
+      html: `
+        <div class="custom-marker-card">
+          <div class="marker-title">Lote B</div>
+          <div class="marker-detail">Área: 664m²</div>
+          <div class="marker-status status-available">Disponible</div>
+        </div>
+      `,
+      anchor: 'bottom center'
     }
   ],
   centro: [
     {
       id: 'centro-path-1',
       polyline: [
-        [2.8876, -0.8354],
-        [6.2729, -0.4447]
+        [5.7334, -0.4387],
+        [0.4614, -0.3545],
+        [2.4292, -0.7006],
+        [2.8858, -0.8266],
+        [3.6091, -0.7543],
+        [5.7334, -0.4387]
       ],
       svgStyle: {
         stroke: '#00d2ff',
@@ -89,14 +135,56 @@ const staticLinesData = {
         strokeLinejoin: 'round',
       },
       tooltip: 'Delimitación Centro'
+    },
+    {
+      id: 'centro-path-2',
+      polyline: [
+        [6.2134, -0.4529],
+        [2.9738, -0.8359]
+      ],
+      svgStyle: {
+        stroke: '#00d2ff',
+        strokeWidth: '5px',
+        strokeLinecap: 'round',
+        strokeLinejoin: 'round',
+      },
+      tooltip: 'Delimitación Centro 2'
+    },
+    {
+      id: 'centro-lote-a',
+      position: { yaw: 5.2699, pitch: -1.1883 },
+      html: `
+        <div class="custom-marker-card">
+          <div class="marker-title">Lote A</div>
+          <div class="marker-detail">Área: 598m²</div>
+          <div class="marker-status status-sold">Vendido</div>
+        </div>
+      `,
+      anchor: 'bottom center'
+    },
+    {
+      id: 'centro-lote-b',
+      position: { yaw: 0.8607, pitch: -0.9498 },
+      html: `
+        <div class="custom-marker-card">
+          <div class="marker-title">Lote B</div>
+          <div class="marker-detail">Área: 664m²</div>
+          <div class="marker-status status-available">Disponible</div>
+        </div>
+      `,
+      anchor: 'bottom center'
     }
   ],
   panoramico: [
     {
       id: 'panoramico-path-1',
       polyline: [
-        [5.4855, -0.4489],
-        [6.2028, -0.6174]
+        [5.6272, -0.3796],
+        [5.2741, -0.5441],
+        [6.1878, -0.7387],
+        [6.2088, -0.62],
+        [6.252, -0.5487],
+        [5.6272, -0.3796]
       ],
       svgStyle: {
         stroke: '#00d2ff',
@@ -105,6 +193,44 @@ const staticLinesData = {
         strokeLinejoin: 'round',
       },
       tooltip: 'Delimitación Panorámico'
+    },
+    {
+      id: 'panoramico-path-2',
+      polyline: [
+        [5.4916, -0.4563],
+        [6.2016, -0.6288]
+      ],
+      svgStyle: {
+        stroke: '#00d2ff',
+        strokeWidth: '5px',
+        strokeLinecap: 'round',
+        strokeLinejoin: 'round',
+      },
+      tooltip: 'Delimitación Panorámico 2'
+    },
+    {
+      id: 'panoramico-lote-a',
+      position: { yaw: 5.5241, pitch: -0.5508 },
+      html: `
+        <div class="custom-marker-card">
+          <div class="marker-title">Lote A</div>
+          <div class="marker-detail">Área: 598m²</div>
+          <div class="marker-status status-sold">Vendido</div>
+        </div>
+      `,
+      anchor: 'bottom center'
+    },
+    {
+      id: 'panoramico-lote-b',
+      position: { yaw: 5.8797, pitch: -0.5278 },
+      html: `
+        <div class="custom-marker-card">
+          <div class="marker-title">Lote B</div>
+          <div class="marker-detail">Área: 664m²</div>
+          <div class="marker-status status-available">Disponible</div>
+        </div>
+      `,
+      anchor: 'bottom center'
     }
   ]
 };
@@ -273,7 +399,7 @@ function App() {
         if (item) {
           if (item.type === '360') {
             setSelected2DImage(null);
-            
+
             // Limpiar marcadores/líneas antiguas inmediatamente
             const markersPlugin = viewer.getPlugin(MarkersPlugin);
             if (markersPlugin) {
@@ -284,7 +410,7 @@ function App() {
               caption: `Vista ${item.name} 360`,
             }).then(() => {
               setActivePanoId(item.id);
-              
+
               // Limpiar dibujo temporal al cambiar de escena
               currentPointsRef.current = [];
               setDrawnPoints([]);
@@ -352,7 +478,7 @@ function App() {
           caption: `Vista ${item.name} 360`,
         }).then(() => {
           setActivePanoId(item.id);
-          
+
           // Limpiar dibujo temporal
           currentPointsRef.current = [];
           setDrawnPoints([]);
