@@ -26,6 +26,13 @@ html,
   background-color: #050505;
 }
 
+.app-container {
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  position: relative;
+}
+
 /* App Header Styling */
 .app-header {
   position: absolute;
@@ -431,6 +438,11 @@ html,
   }
 
   /* Map/Compass Customization on Mobile */
+  .psv-map,
+  .psv-map-container {
+    bottom: 70px !important;
+    left: 15px !important;
+  }
 
 
   /* Custom Gallery Dock Scroll */
